@@ -1,15 +1,7 @@
 #!/usr/bin/env python
-#
-#Name:        optical_flow
-#Purpose:     get visual odometrey from camera pointing down and rangefinder values
-#Author:      Matthieu MAGNON
-#Created:     May 2017
-#
-#Env : Python 2.7, openCV 3, ROS indigo
-#-------------------------------------------------------------------------------
 
-## added features : ##
-# activate isCorrosion on edge rising
+# added features :
+# activate isCorrosion on Edge Rising
 
 import rospy
 import time
@@ -28,22 +20,23 @@ ang_min = -45 # min angular value of lidarlaser range
 ang_max = 45 # max angular value of lidar laser range
 nb_segment = 10 # nb of segment in the range
 len_segment = (abs(ang_min) + abs(ang_max) )/ nb_segment # nb of value in each range
-dist_treshold = 0.6 # min distance for abstcale detection in meter
+dist_treshold = 0.6 # in meter
 if not isinstance(len_segment, int): # to avoid float type for len_segment
 	len_segment = int(len_segment +1 )
 
 
 ## GLOBAL VARIABLES
+
 switch_mode = 'DEF'
 previous_mode = 'AUTO'
 sonar_array = [0 for i in range(3)]
 laser_array = [0 for j in range(360)]
 filt_laser_array = [ 0 for j in range (nb_segment)]
 inf = float('inf')
-coef_vel_ang = 0.5
-coef_vel_lin = 0.5
 isObstacle = 'FALSE'
 isCorrosion = 'FALSE'
+coef_vel_ang = 0.5
+coef_vel_ang = 0.5
 previousCorrosionState = 'FALSE'
 
 
@@ -114,7 +107,7 @@ def auto_mode(dist_treshold):
 		
 		previous_mode = 'SMTHG'
 		
-		# update rising edge
+		# Update Rising Edge
 		previousCorrosionState = currentCorrosionState
 		
 	else : # go straigh forward
@@ -169,7 +162,7 @@ def callback_joy(data):
 		log_msg = "MODE " + switch_mode
 		rospy.loginfo(log_msg)
 		previous_mode = current_mode
-        
+	
 		
 def callback_sonar(data):
 	global sonar_array
@@ -185,7 +178,7 @@ def callback_img(img):
 	np_arr = np.fromstring(img.data, np.uint8)
 	image_np = cv2.imdecode(np_arr, 1)
 	
-
+		
 def callback_laser(scan):
 	global sonar_array
 	global filt_laser_array
@@ -203,6 +196,7 @@ def callback_laser(scan):
 def callback_bool(boole):
 	global isCorrosion
 	
+	#print(' BOOOOOOLLLL : ', boole)
 	if boole.data == 1:
 		isCorrosion = 'TRUE'
 	else:
@@ -227,7 +221,6 @@ def laser_pre_processing(laser_array, nb_segment):
 				# if empty segment force 10.0
 				filt_laser_array[j] = 10.0	
 		return filt_laser_array
-
 
 if __name__ == '__main__':
 	
@@ -283,8 +276,8 @@ if __name__ == '__main__':
 		coef_vel_ang = int(sys.argv[2])/100.0
 	
 	else :
-		coef_vel_lin = 81/100.0
-		coef_vel_ang = 72/100.0
+		coef_vel_lin = 82/100.0
+		coef_vel_ang = 92/100.0
 		rospy.loginfo("Default parameter for linear velocity is : %s percent", )
 		rospy.loginfo("Default parameter for angular velocity is : %s percent", )
 	
